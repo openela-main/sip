@@ -40,7 +40,7 @@
 Summary: SIP - Python/C++ Bindings Generator
 Name: sip
 Version: 4.19.25
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # sipgen/parser.{c.h} is GPLv3+ with exceptions (bison)
 License: GPLv2 or GPLv3 and (GPLv3+ with exceptions)
@@ -63,6 +63,12 @@ Patch51: sip-4.18-no_rpath.patch
 Patch53: sip-4.19.18-no_hardcode_sip_so.patch
 # Recognize the py_ssize_t_clean directive to avoid FTBFS with PyQt 5.15.6
 Patch54: sip-4.19.25-py_ssize_t_clean.patch
+
+# Pass py_ssize_t_clean through to module directive for compatibility with PyQt5
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=998605
+# https://github.com/ros/meta-ros/issues/1072
+# https://raw.githubusercontent.com/robwoolley/meta-openembedded/ad1494b75f6ece452bdaec88c32772a32cd9186b/meta-oe/recipes-devtools/sip/sip3/added-the-py_ssize_t_clean-argument-to-the-module-directive.patch
+Patch55: sip-4.19.25-py_ssize_t_clean_module_directive.patch
 
 # extracted from sip.h, SIP_API_MAJOR_NR SIP_API_MINOR_NR defines
 Source1: macros.sip
@@ -210,6 +216,7 @@ This is the Python 3 build of wx-siplib.
 %patch51 -p1 -b .no_rpath
 %patch53 -p1 -b .no_sip_so
 %patch54 -p1 -b .py_ssize_t_clean
+%patch55 -p1 -b .py_ssize_t_clean_module_directive
 
 %build
 %if %{with python2}
@@ -455,6 +462,10 @@ popd
 
 
 %changelog
+* Wed Mar 13 2024 Jan Grulich <jgrulich@redhat.com> - 4.19.25-2
+- Add py_ssize_t_clean module support for compatibility with python-qt5
+  Resolves: RHEL-27554
+
 * Mon Apr 04 2022 Jan Grulich <jgrulich@redhat.com> - 4.19.25-1
 - 4.19.25 + sync with Fedora
   Resolves: bz#2071605
